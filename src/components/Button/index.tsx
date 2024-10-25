@@ -1,25 +1,26 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity, TouchableOpacityProps, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, TouchableOpacityProps, View, ViewStyle } from 'react-native';
 import { Text } from '../Text/Text';
 
 type ButtonVariants = 'contained' | 'outlined' | 'text'
 
-interface LargeButtonProps {
-  containerProps?: TouchableOpacityProps,
+interface LargeButtonProps extends TouchableOpacityProps {
+  containerStyle?: ViewStyle,
   title: string,
   variant?: ButtonVariants
 }
 
 export function LargeButton({
-  containerProps = {},
+  containerStyle = {},
   title,
   variant = 'contained',
+  ...buttonProps
 }: LargeButtonProps) {
   const variantStyle = styles[variant];
   const textColor = variant === 'contained' ? { color: '#FFF' } : { color: '#0048ce' };
 
   return (
-    <TouchableOpacity {...containerProps} style={[styles.container, containerProps.style ]} >
+    <TouchableOpacity {...buttonProps} style={[styles.container, containerStyle ]}>
       <View style={[styles.buttonBase, variantStyle]}>
         <Text style={[styles.textStyle, textColor]}>{title}</Text>
       </View>
