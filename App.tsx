@@ -14,6 +14,7 @@ import React from 'react';
 //   Colors,
 // } from 'react-native/Libraries/NewAppScreen';
 import { Router } from './src/routes/Routes';
+import Toast from 'react-native-toast-message';
 
 function App(): React.JSX.Element {
   // const isDarkMode = useColorScheme() === 'dark';
@@ -23,11 +24,15 @@ function App(): React.JSX.Element {
   // };
 
   return (
+    <>
+
+    <Router />
+    <Toast />
+    </>
       // <StatusBar
       //   barStyle={isDarkMode ? 'light-content' : 'dark-content'}
       //   backgroundColor={backgroundStyle.backgroundColor}
       // />
-      <Router />
   );
 }
 

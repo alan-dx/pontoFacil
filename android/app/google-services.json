@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "259354209503",
+    "project_id": "pontofacil-73c86",
+    "storage_bucket": "pontofacil-73c86.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:259354209503:android:a52bc966dfb16b5dde8d6a",
+        "android_client_info": {
+          "package_name": "com.pontofacil"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCm5otA43Mi7_bX3lSdrc7dycWX030HJ6o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

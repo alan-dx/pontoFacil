@@ -7,6 +7,8 @@ import { LargeButton } from '../../components/Button';
 import { AuthStackParamsList } from '../../routes/AuthStack';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RadioGroup } from 'react-native-radio-buttons-group';
+import auth from '@react-native-firebase/auth';
+import Toast from 'react-native-toast-message';
 
 const radioButtons = [
   {
@@ -28,9 +30,34 @@ export function LoginScreen({navigation}: NativeStackScreenProps<AuthStackParams
   const [password, setPassword] = React.useState('');
   const [selectedId, setSelectedId] = React.useState('1');
 
-
   function goToSignUpPage() {
     navigation.navigate('SignUpScreen');
+  }
+
+  function signIn() {
+    auth().signInWithEmailAndPassword(
+      email,
+      password
+    ).then(() => {
+      console.log('sign in success');
+    }).catch(error => {
+      if (error.code === 'auth/invalid-credential') {
+        Toast.show({
+          type: 'error',
+          text1: 'Não foi possível realizar o login. Verifique suas credenciais.',
+          position: 'bottom',
+        });
+      }
+
+      if (error.code === 'auth/invalid-email') {
+        Toast.show({
+          type: 'error',
+          text1: 'E-mail inválido! Insira um e-mail válido.',
+          position: 'bottom',
+        });
+      }
+
+    });
   }
 
   return (
@@ -39,7 +66,7 @@ export function LoginScreen({navigation}: NativeStackScreenProps<AuthStackParams
         Ponto Fácil - Login
       </Text>
       <TextInput onChangeText={setEmail} value={email} placeholder="E-mail" keyboardType="email-address" autoCapitalize="none" />
-      <TextInput onChangeText={setPassword} value={password} placeholder="Senha" />
+      <TextInput onChangeText={setPassword} value={password} placeholder="Senha" secureTextEntry />
       <RadioGroup
             radioButtons={radioButtons}
             onPress={(id) => setSelectedId(id)}
@@ -54,8 +81,8 @@ export function LoginScreen({navigation}: NativeStackScreenProps<AuthStackParams
             }}
             layout="row"
         />
-      <LargeButton title="Entrar" containerStyle={{ marginTop: 8 }} />
-      <LargeButton variant="text" title="Criar conta" containerStyle={{ marginTop: 8}} onPress={goToSignUpPage} />
+      <LargeButton title="Entrar" containerStyle={{ marginTop: 8 }} onPress={signIn} />
+      <LargeButton variant="text" title="Criar conta" containerStyle={{ marginTop: 8}} onPress={goToSignUpPage}  />
     </Screen>
   );
 }

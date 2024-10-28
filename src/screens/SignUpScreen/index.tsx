@@ -7,6 +7,8 @@ import { LargeButton } from '../../components/Button';
 import { AuthStackParamsList } from '../../routes/AuthStack';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import RadioGroup from 'react-native-radio-buttons-group';
+import auth from '@react-native-firebase/auth';
+import Toast from 'react-native-toast-message';
 
 export function SignUpScreen({navigation}: NativeStackScreenProps<AuthStackParamsList, 'SignUpScreen'>) {
 
@@ -18,6 +20,40 @@ export function SignUpScreen({navigation}: NativeStackScreenProps<AuthStackParam
 
   function goToSignUpPage() {
     navigation.goBack();
+  }
+
+  function signUpUser() {
+    auth()
+    .createUserWithEmailAndPassword(email, confirmPassword)
+    .then(() => {
+      console.log('User account created & signed in!');
+    })
+    .catch(error => {
+      if (error.code === 'auth/email-already-in-use') {
+        Toast.show({
+          type: 'error',
+          text1: 'Esse e-mail já esta cadastrado! Tente utilizar outro endereço.',
+          position: 'bottom',
+        });
+      }
+
+      if (error.code === 'auth/invalid-email') {
+        Toast.show({
+          type: 'error',
+          text1: 'E-mail inválido! Insira um e-mail válido.',
+          position: 'bottom',
+        });
+      }
+
+      if (error.code === 'auth/weak-password') {
+        Toast.show({
+          type: 'error',
+          text1: 'Senha muito curta! A senha teve possuir ao menos 6 caracteres.',
+          position: 'bottom',
+        });
+      }
+
+    });
   }
 
   const radioButtons = React.useMemo(() => ([
@@ -57,7 +93,7 @@ export function SignUpScreen({navigation}: NativeStackScreenProps<AuthStackParam
             }}
             layout="row"
         />
-      <LargeButton title="Criar conta" containerStyle={{ marginTop: 8 }} />
+      <LargeButton title="Criar conta" containerStyle={{ marginTop: 8 }} onPress={signUpUser}/>
       <LargeButton variant="text" title="Voltar" containerStyle={{ marginTop: 8}} onPress={goToSignUpPage} />
     </Screen>
   );
