@@ -9,6 +9,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RadioGroup } from 'react-native-radio-buttons-group';
 import auth from '@react-native-firebase/auth';
 import Toast from 'react-native-toast-message';
+import { useUser } from '../../hooks/useAuth';
 
 const radioButtons = [
   {
@@ -30,6 +31,8 @@ export function LoginScreen({navigation}: NativeStackScreenProps<AuthStackParams
   const [password, setPassword] = React.useState('');
   const [selectedId, setSelectedId] = React.useState('1');
 
+  const {setUser} = useUser();
+
   function goToSignUpPage() {
     navigation.navigate('SignUpScreen');
   }
@@ -38,8 +41,13 @@ export function LoginScreen({navigation}: NativeStackScreenProps<AuthStackParams
     auth().signInWithEmailAndPassword(
       email,
       password
-    ).then(() => {
-      console.log('sign in success');
+    ).then(({user}) => {
+      console.log('sign in success', user);
+      setUser({
+        email: user.email || '',
+        id: user.uid,
+        isCompany: true,
+      });
     }).catch(error => {
       if (error.code === 'auth/invalid-credential') {
         Toast.show({
