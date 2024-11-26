@@ -6,7 +6,9 @@ import { ClockScreen } from '../screens/ClockScreen';
 
 export type AppStackParamsList = {
   CollaboratorsScreen: undefined;
-  ClockScreen: undefined
+  ClockScreen: {
+    userId: string
+  }
 }
 
 const Stack = createNativeStackNavigator<AppStackParamsList>();
