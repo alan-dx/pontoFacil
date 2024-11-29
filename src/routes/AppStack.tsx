@@ -7,7 +7,7 @@ import { ClockScreen } from '../screens/ClockScreen';
 export type AppStackParamsList = {
   CollaboratorsScreen: undefined;
   ClockScreen: {
-    userId: string
+    collaboratorId: string
   }
 }
 

@@ -6,12 +6,14 @@ type ButtonVariants = 'contained' | 'outlined' | 'text'
 
 interface LargeButtonProps extends TouchableOpacityProps {
   containerStyle?: ViewStyle,
+  customButtonStyle?: ViewStyle,
   title: string,
   variant?: ButtonVariants
 }
 
 export function LargeButton({
   containerStyle = {},
+  customButtonStyle = {},
   title,
   variant = 'contained',
   ...buttonProps
@@ -21,7 +23,7 @@ export function LargeButton({
 
   return (
     <TouchableOpacity {...buttonProps} style={[styles.container, containerStyle ]}>
-      <View style={[styles.buttonBase, variantStyle]}>
+      <View style={[styles.buttonBase, variantStyle, customButtonStyle]}>
         <Text style={[styles.textStyle, textColor]}>{title}</Text>
       </View>
     </TouchableOpacity>
@@ -36,6 +38,7 @@ const styles = StyleSheet.create({
     height: 40,
     padding: 8,
     alignItems: 'center',
+    borderRadius: 4,
   },
   contained: {
     backgroundColor: '#0048ce',

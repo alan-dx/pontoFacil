@@ -1,7 +1,6 @@
 import React from 'react';
 import { Screen } from '../../components/Screen';
 import { FlatList, ListRenderItemInfo } from 'react-native';
-import { Collaborator } from '../../types/Collaborator';
 import { CollaboratorItem } from './components/CollaboratorListItem';
 import firestore from '@react-native-firebase/firestore';
 import { useUser } from '../../hooks/useAuth';
@@ -23,7 +22,6 @@ export function CollaboratorsScreen({navigation}: NativeStackScreenProps<AppStac
       const collaboratorsByCompany: User[] = [];
 
 
-      //!CRIAR UMA ESTRUTURA PRA DIFERENCIAR
       collaboratorsData.docs.forEach(doc => {
         const collaborator = doc.data() as User;
         collaboratorsByCompany.push({
@@ -47,10 +45,10 @@ export function CollaboratorsScreen({navigation}: NativeStackScreenProps<AppStac
 
 
   function handleGoToClockScreen(id: string) {
-    navigation.navigate('ClockScreen', { userId: id});
+    navigation.navigate('ClockScreen', { collaboratorId: id});
   }
 
-  function renderItem({item}: ListRenderItemInfo<Collaborator>) {
+  function renderItem({item}: ListRenderItemInfo<User>) {
     return (
       <CollaboratorItem collaborator={item}  onPress={() => handleGoToClockScreen(item.id)} />
     );
