@@ -4,7 +4,7 @@ import { Screen } from '../../components/Screen';
 import { Text } from '../../components/Text/Text';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppStackParamsList } from '../../routes/AppStack';
-import firestore, { Filter, FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
+import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { Calendar } from './components/Calendar';
 import { differenceInSeconds } from 'date-fns';
 import { ClockCounter } from './components/ClockCounter';
@@ -17,6 +17,9 @@ import { getCurrentDate } from '../../utils/getCurrentDate';
 import { Clock } from '../../types/Clock';
 import { getCollaboratorDoc } from '../../utils/firebase/getCollaboratorDoc';
 import { getCurrentRunningClock } from '../../utils/firebase/getCurrentRunningClock';
+import { convertSecondsToHMS } from '../../utils/convertSecondsToHMS';
+import { getAllCurrentDayClocks } from '../../utils/firebase/getAllCurrentDayClocks';
+import { getAllCurrentMonthClocks } from '../../utils/firebase/getAllCurrentMonthClocks';
 
 export function ClockScreen({route}:  NativeStackScreenProps<AppStackParamsList, 'ClockScreen'>) {
   const [isPlaying, setIsPlaying] = React.useState(false);
@@ -24,6 +27,8 @@ export function ClockScreen({route}:  NativeStackScreenProps<AppStackParamsList,
   const [intervalId, setIntervalId] = React.useState<NodeJS.Timeout>();
   const [currentDate, setCurrentDate] = React.useState(getCurrentDate());
   const [clocks, setClocks] = React.useState<Clock[]>([]);
+  const [allSecondsOfTheDay, setAllSecondsOfTheDay] = React.useState(0);
+  const [allSecondsOfTheMonth, setAllSecondsOfTheMonth] = React.useState(0);
 
   const {user} = useUser();
   const isFocused = useIsFocused();
@@ -32,14 +37,9 @@ export function ClockScreen({route}:  NativeStackScreenProps<AppStackParamsList,
 
   const getClocks = React.useCallback(async () => {
     try {
-      const clocks = await firestore()
-        .collection('collaborators')
-        .doc(collaboratorId)
-        .collection('clocks')
-        .where(Filter.and(Filter('end', '!=', null), Filter('day', '==', currentDate.getDate()), Filter('month', '==', currentDate.getMonth() + 1), Filter('year', '==', currentDate.getFullYear())))
-        .get();
+      const allCurrentDayClocks = await getAllCurrentDayClocks(collaboratorId, currentDate);
 
-      clocks.docs.map(async doc => {
+      allCurrentDayClocks.docs.map(async doc => {
         const clockData = doc.data();
 
         setClocks(prevState => {
@@ -58,6 +58,37 @@ export function ClockScreen({route}:  NativeStackScreenProps<AppStackParamsList,
       setClocks([]);
     }
   }, [collaboratorId, currentDate]);
+
+  const getSecondsOfDay = async (date: Date) => {
+    const allCurrentDayClocks = await getAllCurrentDayClocks(collaboratorId, date);
+
+    let totalSeconds = 0;
+
+    await Promise.all(allCurrentDayClocks.docs.map(async doc => {
+      const clockData = doc.data();
+
+      totalSeconds += clockData.duration;
+    }));
+
+    setAllSecondsOfTheDay(totalSeconds);
+    return totalSeconds;
+  };
+
+  const getSecondsOfMonth = async () => {
+    const date = getCurrentDate();
+    const allCurrentDayClocks = await getAllCurrentMonthClocks(collaboratorId, date);
+
+    let totalSeconds = 0;
+
+    await Promise.all(allCurrentDayClocks.docs.map(async doc => {
+      const clockData = doc.data();
+
+      totalSeconds += clockData.duration;
+    }));
+
+    setAllSecondsOfTheMonth(totalSeconds);
+    return totalSeconds;
+  };
 
   const defInterval = React.useCallback(() => {
     if (intervalId) {
@@ -101,6 +132,7 @@ export function ClockScreen({route}:  NativeStackScreenProps<AppStackParamsList,
         clearInterval(intervalId);
         setCurrentCounter(0);
         getClocks();
+        getSecondsOfDay(currentDate);
       });
     }
   };
@@ -110,6 +142,7 @@ export function ClockScreen({route}:  NativeStackScreenProps<AppStackParamsList,
   }, [collaboratorId]);
 
   React.useEffect(() => {
+
     if (isFocused) {
       getClocks();
       getCurrentRunningClock(collaboratorId).then((querySnapshot) => {
@@ -128,6 +161,8 @@ export function ClockScreen({route}:  NativeStackScreenProps<AppStackParamsList,
           setCurrentCounter(0);
         }
       });
+      getSecondsOfDay(currentDate);
+      getSecondsOfMonth();
     }
   }, [isFocused, collaboratorId]);
 
@@ -136,17 +171,17 @@ export function ClockScreen({route}:  NativeStackScreenProps<AppStackParamsList,
     getClocks();
   },[currentDate]);
 
-
   if (!collaboratorId) {return null;}
 
   return (
     <Screen>
       <Calendar currentDate={currentDate} onChangeDate={(newDate) => {
         setCurrentDate(newDate);
+        getSecondsOfDay(newDate);
       }} />
       <ClockCounter counter={currentCounter} />
-      <Text>Total do dia: 03:11:20</Text>
-      <Text>Total do mês: 33:11:20</Text>
+      <Text>Total do dia: {convertSecondsToHMS(allSecondsOfTheDay)}</Text>
+      <Text>Total do mês: {convertSecondsToHMS(allSecondsOfTheMonth)}</Text>
       <Divider />
       <ClocksList clocks={clocks} />
       {!user?.isCompany && (
