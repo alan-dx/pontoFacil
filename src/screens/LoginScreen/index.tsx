@@ -29,8 +29,8 @@ const radioButtons = [
 
 export function LoginScreen({navigation}: NativeStackScreenProps<AuthStackParamsList, 'LoginScreen'>) {
 
-  const [email, setEmail] = React.useState('alanztk@gmail.com');
-  const [password, setPassword] = React.useState('123456');
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
   const [selectedId, setSelectedId] = React.useState('1');
 
   const {setUser} = useUser();
