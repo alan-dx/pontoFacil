@@ -21,7 +21,6 @@ export function CollaboratorsScreen({navigation}: NativeStackScreenProps<AppStac
 
       const collaboratorsByCompany: User[] = [];
 
-
       collaboratorsData.docs.forEach(doc => {
         const collaborator = doc.data() as User;
         collaboratorsByCompany.push({
@@ -53,8 +52,6 @@ export function CollaboratorsScreen({navigation}: NativeStackScreenProps<AppStac
       <CollaboratorItem collaborator={item}  onPress={() => handleGoToClockScreen(item.id)} />
     );
   }
-
-  //TODO: TERMINAR DE INSTALAR a biblioteca de icones
 
   if (!user) {return null;}
 

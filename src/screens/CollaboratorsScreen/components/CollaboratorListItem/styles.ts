@@ -12,4 +12,10 @@ export const styles = StyleSheet.create({
   fullNameText: {
     fontWeight: 600,
   },
+  working: {
+    color: 'green',
+  },
+  away: {
+    color: 'red',
+  },
 });

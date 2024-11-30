@@ -115,10 +115,13 @@ export function ClockScreen({route}:  NativeStackScreenProps<AppStackParamsList,
         month: currentDate.getMonth() + 1,
         day: currentDate.getDate(),
         year: currentDate.getFullYear(),
-      }
-      );
+      });
+
+      await firestore().collection('collaborators').doc(collaboratorId).update({
+        status: 'working',
+      });
     } else {
-      getCurrentRunningClock(collaboratorId).then((querySnapshot) => {
+      getCurrentRunningClock(collaboratorId).then(async (querySnapshot) => {
         const docs = querySnapshot.docs;
 
         if (docs[0]) {
@@ -127,12 +130,17 @@ export function ClockScreen({route}:  NativeStackScreenProps<AppStackParamsList,
             end: getCurrentDate(),
             duration: differenceInSeconds(getCurrentDate(), clock.data().start.toDate()),
           });
+
+          await firestore().collection('collaborators').doc(collaboratorId).update({
+            status: 'away',
+          });
         }
       }).finally(() => {
         clearInterval(intervalId);
         setCurrentCounter(0);
         getClocks();
         getSecondsOfDay(currentDate);
+        getSecondsOfMonth();
       });
     }
   };

@@ -19,7 +19,7 @@ export function ClockItem({clock}: ClockItemProps) {
     <View style={styles.container} >
       <View style={styles.startEndBox}>
         <Text>{format(start, 'HH:mm:ss')}</Text>
-        <Text>{end && '-' + format(end, 'HH:mm:ss')}</Text>
+        <Text>{end && ' - ' + format(end, 'HH:mm:ss')}</Text>
       </View>
       <Text bold >{hms}s</Text>
     </View>
